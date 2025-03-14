@@ -1,0 +1,9 @@
+# version: '27.5.1'
+services:
+  scylla:
+    image: scylladb/scylla:latest
+    container_name: marketplace-scylla
+    ports:
+      - 9093:9042
+    environment:
+      SCYLLA_RPC_ADDRESS: '0.0.0.0'
