@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
 --                                       updated_at timestamp,
 --                                       PRIMARY KEY (user_id, created_at, id)
 -- ) WITH CLUSTERING ORDER BY (created_at DESC);
-DROP TABLE marketplace_service_db.orders;
+DROP TABLE IF EXISTS marketplace_service_db.orders;
 
 CREATE TABLE IF NOT EXISTS orders (
                                       id UUID PRIMARY KEY,

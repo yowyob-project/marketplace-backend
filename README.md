@@ -153,6 +153,4 @@ src/main/java/com/marketplace/
 5. Open a Pull Request
 
 ## License
-Email : boungo.tresor@gmail.com
-
-This project is a service of a global project for 5GI at the National School of Enginnering Yaounde Cameroon (ENSPY)
+MIT

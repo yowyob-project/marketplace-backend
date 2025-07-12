@@ -22,7 +22,7 @@ public class WebClientConfig {
     @Bean
     public WebClient notificationServiceWebClient() {
         return WebClient.builder()
-                .baseUrl("http://http://192.168.1.169:4014/")
+                .baseUrl("http://192.168.1.169:4014/")
                 .build();
     }
 }
