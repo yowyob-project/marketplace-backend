@@ -1,5 +1,8 @@
 
-CREATE KEYSPACE marketplace_service_db WITH replication = {'class': 'org.apache.cassandra.locator.SimpleStrategy', 'replication_factor': '1'} AND durable_writes = true AND tablets = {'enabled': false};
+CREATE KEYSPACE IF NOT EXISTS marketplace_service_db
+    WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+
+USE marketplace_service_db;
 
 CREATE TYPE marketplace_service_db.invoice_items (
     description text,
