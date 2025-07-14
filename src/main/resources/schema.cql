@@ -4,14 +4,14 @@ CREATE KEYSPACE IF NOT EXISTS marketplace_service_db
 
 USE marketplace_service_db;
 
-CREATE TYPE marketplace_service_db.invoice_items (
+CREATE TYPE IF NOT EXISTS marketplace_service_db.invoice_items (
     description text,
     quantity int,
     unit_price decimal,
     total decimal
 );
 
-CREATE TABLE marketplace_service_db.addresses (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.addresses (
                                                   id uuid,
                                                   city text,
                                                   country text,
@@ -37,10 +37,10 @@ CREATE TABLE marketplace_service_db.addresses (
       AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE INDEX addresses_by_user ON marketplace_service_db.addresses(user_id);
+CREATE INDEX IF NOT EXISTS addresses_by_user ON marketplace_service_db.addresses(user_id);
 
 
-CREATE TABLE marketplace_service_db.cart_items (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.cart_items (
                                                    cart_id uuid,
                                                    id uuid,
                                                    added_at timestamp,
@@ -64,7 +64,7 @@ CREATE TABLE marketplace_service_db.cart_items (
     AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE TABLE marketplace_service_db.carts (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.carts (
                                               user_id uuid,
                                               id uuid,
                                               created_at timestamp,
@@ -88,7 +88,7 @@ CREATE TABLE marketplace_service_db.carts (
     AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE TABLE marketplace_service_db.invoices (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.invoices (
                                                  invoice_id text,
                                                  amount decimal,
                                                  customer_id text,
@@ -111,7 +111,7 @@ CREATE TABLE marketplace_service_db.invoices (
       AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE TABLE marketplace_service_db.order_items (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.order_items (
                                                     order_id uuid,
                                                     id uuid,
                                                     organisation_id uuid,
@@ -136,7 +136,7 @@ CREATE TABLE marketplace_service_db.order_items (
     AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE TABLE marketplace_service_db.orders (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.orders (
                                                id uuid,
                                                created_at timestamp,
                                                order_number text,
@@ -163,10 +163,10 @@ CREATE TABLE marketplace_service_db.orders (
       AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE INDEX orders_by_user ON marketplace_service_db.orders(user_id);
+CREATE INDEX IF NOT EXISTS orders_by_user ON marketplace_service_db.orders(user_id);
 
 
-CREATE TABLE marketplace_service_db.organisation (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.organisation (
                                                      id uuid,
                                                      description text,
                                                      name text,
@@ -187,7 +187,7 @@ CREATE TABLE marketplace_service_db.organisation (
       AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE TABLE marketplace_service_db.products (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.products (
                                                  id uuid,
                                                  created_at timestamp,
                                                  description text,
@@ -213,13 +213,13 @@ CREATE TABLE marketplace_service_db.products (
       AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE INDEX products_by_seller ON marketplace_service_db.products(seller_id);
+CREATE INDEX IF NOT EXISTS products_by_seller ON marketplace_service_db.products(seller_id);
 
 
-CREATE INDEX products_by_status ON marketplace_service_db.products(status);
+CREATE INDEX IF NOT EXISTS products_by_status ON marketplace_service_db.products(status);
 
 
-CREATE TABLE marketplace_service_db.reviews (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.reviews (
                                                 user_id uuid,
                                                 product_id uuid,
                                                 id uuid,
@@ -245,7 +245,7 @@ CREATE TABLE marketplace_service_db.reviews (
     AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE TABLE marketplace_service_db.users (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.users (
                                               id uuid,
                                               created_at timestamp,
                                               email text,
@@ -271,10 +271,10 @@ CREATE TABLE marketplace_service_db.users (
       AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE INDEX users_by_email ON marketplace_service_db.users(email);
+CREATE INDEX IF NOT EXISTS users_by_email ON marketplace_service_db.users(email);
 
 
-CREATE TABLE marketplace_service_db.wishlist_items (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.wishlist_items (
                                                        wishlist_id uuid,
                                                        id uuid,
                                                        added_at timestamp,
@@ -296,10 +296,10 @@ CREATE TABLE marketplace_service_db.wishlist_items (
     AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE INDEX wishlist_items_by_product ON marketplace_service_db.wishlist_items(product_id);
+CREATE INDEX IF NOT EXISTS wishlist_items_by_product ON marketplace_service_db.wishlist_items(product_id);
 
 
-CREATE TABLE marketplace_service_db.wishlists (
+CREATE TABLE IF NOT EXISTS marketplace_service_db.wishlists (
                                                   id uuid,
                                                   created_at timestamp,
                                                   user_id uuid,
@@ -319,4 +319,4 @@ CREATE TABLE marketplace_service_db.wishlists (
       AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
 
-CREATE INDEX wishlists_by_user ON marketplace_service_db.wishlists(user_id);
+CREATE INDEX IF NOT EXISTS wishlists_by_user ON marketplace_service_db.wishlists(user_id);
