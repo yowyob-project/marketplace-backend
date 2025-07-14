@@ -117,7 +117,7 @@ public class Cart {
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
-    private String orderId;
+    //private String orderId;
 
     public UUID getUserId() {
         return userId;
