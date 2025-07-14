@@ -45,8 +45,9 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> createPaymentRequest(
             @RequestBody PaymentRequest request) {
         try {
+            //.uri("/3qUkt_O1YcClmouM6_-W-dZ5bWdx13uf/payin")
             PaymentResponse response = paymentServiceWebClient.post()
-                    .uri("/3qUkt_O1YcClmouM6_-W-dZ5bWdx13uf/payin")
+                    .uri("/payin")
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(PaymentResponse.class)
@@ -54,6 +55,7 @@ public class PaymentController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -61,12 +63,12 @@ public class PaymentController {
     private CartService cartService;
     private OrderService orderService;
     private OrderToCartConverter orderToCartConverter;
-    @PostMapping("/payin/{userId}")
+    @PostMapping("/payin/{userId}/{orderId}/{userNumber}")
     @Operation(summary = "Payin an order for a specific user",
             description = "Pay your bill")
     @ApiResponse(responseCode = "200", description = "Pay order started")
     public ResponseEntity<PaymentResponse> createPaymentRequestByUserId(
-            @RequestBody PaymentRequest request, @PathVariable String UserId, @PathVariable UUID orderId) {
+            @RequestBody PaymentRequest request, @PathVariable String UserId, @PathVariable UUID orderId, @PathVariable String userNumber) {
         try {
             CartResponseDTO userCart = cartService.getCartByUserId(UUID.fromString(UserId));
 
@@ -75,6 +77,7 @@ public class PaymentController {
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .transactionAmount(totalAmount)
                     .payerReference(UserId)
+                    .payerPhoneNumber(userNumber)
                     .build();
 
             PaymentResponse response = paymentServiceWebClient.post()

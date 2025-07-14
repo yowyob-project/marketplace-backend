@@ -21,8 +21,8 @@ public class OrderItem {
     @Column("product_id")
     private UUID productId;
 
-    @Column("organization_id") // Ajout de la clé étrangère vers l'organisation
-    private UUID organizationId;
+    @Column("organisation_id") // Ajout de la clé étrangère vers l'organisation
+    private UUID organisationId;
 
     @Column("quantity")
     private Integer quantity;
@@ -32,12 +32,6 @@ public class OrderItem {
 
     @Column("subtotal")
     private BigDecimal subtotal;
-
-    @Column("organization_id")
-    private UUID organization_id;
-
-
-
 
     public UUID getOrderId() {
         return orderId;
@@ -86,14 +80,4 @@ public class OrderItem {
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
     }
-
-    public UUID getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(UUID organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    
 }

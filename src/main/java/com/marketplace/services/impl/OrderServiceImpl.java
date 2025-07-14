@@ -173,14 +173,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void cancelOrder(UUID orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        try {
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        order.setStatus(OrderStatus.CANCELLED);
-        order.setPaymentStatus(PaymentStatus.CANCELLED);
-        order.setUpdatedAt(LocalDateTime.now());
-        orderRepository.save(order);
+            order.setStatus(OrderStatus.CANCELLED);
+            order.setPaymentStatus(PaymentStatus.CANCELLED);
+            order.setUpdatedAt(LocalDateTime.now());
+            orderRepository.save(order);
+
+            System.out.println("✅ Order " + orderId + " has been successfully cancelled.");
+
+        } catch (ResourceNotFoundException e) {
+            System.out.println("❌ Order cancellation failed: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("❌ Unexpected error during order cancellation: " + e.getMessage());
+        }
     }
+
 
     private String generateOrderNumber() {
         return "ORD-" + System.currentTimeMillis();

@@ -1,0 +1,118 @@
+
+GET http:127.0.0.1:4010/api/hello
+
+POST http://127.0.0.1:4010/api/cart/items
+Content-Type: application/json
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+{
+  "productId": "987e6543-e21b-65d4-b321-123456789abc",
+  "quantity": 2,
+  "unitPrice": 29.99
+}
+
+GET http://127.0.0.1:4010/api/cart
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+DELETE http://127.0.0.1:4010/api/cart/items/987e6543-e21b-65d4-b321-123456789abc
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+DELETE http://127.0.0.1:4010/api/cart/clear
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+POST http://127.0.0.1:4010/api/orders/checkout
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+GET http://127.0.0.1:4010/api/orders
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+GET http://127.0.0.1:4010/api/orders/4eeba611-c48a-4a08-ae27-605c486a7e8a
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+POST http://127.0.0.1:4010/api/orders/820d4625-d006-4154-b0ba-063858c1dccc/cancel
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+PUT http://127.0.0.1:4010/api/orders/820d4625-d006-4154-b0ba-063858c1dccc/payment-status
+Content-Type: application/json
+
+{
+  "status": "SUCCESS"
+}
+
+
+GET http://127.0.0.1:4010/api/wishlist
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+POST http://127.0.0.1:4010/api/wishlist/items
+Content-Type: application/json
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+{
+  "productId": "987e6543-e21b-65d4-b321-123456789abc"
+}
+
+DELETE http://127.0.0.1:4010/api/wishlist/items/987e6543-e21b-65d4-b321-123456789abc
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+GET http://127.0.0.1:4010/api/wishlist/items/987e6543-e21b-65d4-b321-123456789abc/check
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+
+POST http://127.0.0.1:4010/api/reviews/products/987e6543-e21b-65d4-b321-123456789abc
+Content-Type: application/json
+User-Id: 123e4567-e89b-12d3-a456-426614174000
+
+{
+  "rating": 5,
+  "comment": "Excellent produit !"
+}
+
+GET http://127.0.0.1:4010/api/reviews/5b9c212d-2edf-4863-b5f8-d0f165b10649
+
+
+GET http://127.0.0.1:4010/api/reviews/products/987e6543-e21b-65d4-b321-123456789abc
+
+
+GET http://127.0.0.1:4010/api/reviews/users/123e4567-e89b-12d3-a456-426614174000
+
+
+PUT http://127.0.0.1:4010/api/reviews/5b9c212d-2edf-4863-b5f8-d0f165b10649
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Finalement, c'était bien, mais pas parfait."
+}
+
+
+DELETE http://127.0.0.1:4010/api/reviews/83e9a410-d0cc-4247-bcc5-53c8b0ceb6a6
+
+
+PUT http://127.0.0.1:4010/api/reviews/5b9c212d-2edf-4863-b5f8-d0f165b10649/verify
+
+
+POST http://localhost:4010/api/payment-client/payin
+Content-Type: application/json
+
+{
+  "transaction_amount": 5000,
+  "payer_name": "Jean Dupont",
+  "payer_phone_number": "+237692134738",
+  "payer_lang": "fr",
+  "payer_email": "jean.dupont@example.com"
+}
+
+POST http://localhost:4010/api/payment-client/payin/123e4567-e89b-12d3-a456-426614174000/2ac68190-1461-4509-92b5-59deb9b7a42d/690112233
+Content-Type: application/json
+
+{}
+
+GET http://localhost:4010/api/payment-client/transactions/abc123456/status
+
+POST http://localhost:4010/api/payment-client/callback
+Content-Type: application/json
+
+{
+  "transaction_reference": "abc123456",
+  "transaction_status": "SUCCESS"
+}

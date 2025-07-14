@@ -77,10 +77,20 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user: " + userId));
 
         List<CartItem> items = cartItemRepository.findByCartId(cart.getId());
+        //items.stream()
+        //        .filter(item -> item.getProductId().equals(productId))
+        //        .findFirst()
+        //        .ifPresent(cartItemRepository::delete);
+
         items.stream()
                 .filter(item -> item.getProductId().equals(productId))
                 .findFirst()
-                .ifPresent(cartItemRepository::delete);
+                .ifPresentOrElse(item -> {
+                    System.out.println("Deleting cart item with productId: {}" + productId);
+                    cartItemRepository.delete(item);
+                }, () -> {
+                    System.out.println("Product with ID {} not found in user's cart" + productId);
+                });
 
         updateCartTotal(cart);
     }

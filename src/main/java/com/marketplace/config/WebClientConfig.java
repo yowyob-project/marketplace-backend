@@ -9,7 +9,7 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.builder().baseUrl("http://localhost:4000").build();
+        return WebClient.builder().baseUrl("http://localhost:4010").build();
     }
 
     @Bean
@@ -22,7 +22,7 @@ public class WebClientConfig {
     @Bean
     public WebClient notificationServiceWebClient() {
         return WebClient.builder()
-                .baseUrl("http://192.168.1.169:4014/")
+                .baseUrl("https://gateway.yowyob.com/notification-service")
                 .build();
     }
 }

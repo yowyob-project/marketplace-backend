@@ -1,13 +1,16 @@
 package com.marketplace.config;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
 import org.springframework.data.cassandra.config.SchemaAction;
 
+import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.core.cql.keyspace.CreateKeyspaceSpecification;
 import org.springframework.data.cassandra.core.cql.keyspace.KeyspaceOption;
 
@@ -65,5 +68,10 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
     @Override
     protected KeyspacePopulator keyspacePopulator() {
         return new ResourceKeyspacePopulator(new ClassPathResource("schema.cql"));
+    }
+
+    @Bean
+    public CassandraTemplate cassandraTemplate(CqlSession session) {
+        return new CassandraTemplate(session);
     }
 }
