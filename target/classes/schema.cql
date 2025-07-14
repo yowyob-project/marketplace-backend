@@ -1,145 +1,319 @@
-CREATE KEYSPACE IF NOT EXISTS marketplace_service_db
-    WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 
-USE marketplace_service_db;
+CREATE KEYSPACE marketplace_service_db WITH replication = {'class': 'org.apache.cassandra.locator.SimpleStrategy', 'replication_factor': '1'} AND durable_writes = true AND tablets = {'enabled': false};
 
-CREATE TABLE IF NOT EXISTS products (
-                                        id UUID PRIMARY KEY,
-                                        name TEXT,
-                                        description TEXT,
-                                        seller_id UUID,
-                                        price DECIMAL,
-                                        quantity INT,
-                                        status TEXT,
-                                        created_at TIMESTAMP,
-                                        updated_at TIMESTAMP
+CREATE TYPE marketplace_service_db.invoice_items (
+    description text,
+    quantity int,
+    unit_price decimal,
+    total decimal
 );
 
-CREATE INDEX IF NOT EXISTS products_by_seller ON products(seller_id);
-CREATE INDEX IF NOT EXISTS products_by_status ON products(status);
+CREATE TABLE marketplace_service_db.addresses (
+                                                  id uuid,
+                                                  city text,
+                                                  country text,
+                                                  created_at timestamp,
+                                                  is_default boolean,
+                                                  state text,
+                                                  street text,
+                                                  user_id uuid,
+                                                  zip_code text,
+                                                  PRIMARY KEY (id)
+) WITH bloom_filter_fp_chance = 0.01
+      AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+      AND comment = ''
+      AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+      AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+      AND crc_check_chance = 1
+      AND default_time_to_live = 0
+      AND gc_grace_seconds = 864000
+      AND max_index_interval = 2048
+      AND memtable_flush_period_in_ms = 0
+      AND min_index_interval = 128
+      AND speculative_retry = '99.0PERCENTILE'
+      AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
-CREATE TABLE IF NOT EXISTS users (
-                                     id UUID PRIMARY KEY,
-                                     email TEXT,
-                                     password TEXT,
-                                     first_name TEXT,
-                                     last_name TEXT,
-                                     role TEXT,
-                                     phone TEXT,
-                                     created_at TIMESTAMP,
-                                     is_active BOOLEAN
-);
 
-CREATE INDEX IF NOT EXISTS users_by_email ON users(email);
+CREATE INDEX addresses_by_user ON marketplace_service_db.addresses(user_id);
 
-CREATE TABLE IF NOT EXISTS carts (
-                                     id UUID,
-                                     user_id UUID,
-                                     total_amount DECIMAL,
-                                     created_at TIMESTAMP,
-                                     updated_at TIMESTAMP,
-                                     PRIMARY KEY (user_id, id)
-    );
 
-CREATE TABLE IF NOT EXISTS cart_items (
-                                          id UUID,
-                                          cart_id UUID,
-                                          product_id UUID,
-                                          quantity INT,
-                                          unit_price DECIMAL,
-                                          added_at TIMESTAMP,
-                                          PRIMARY KEY ((cart_id), id)
-    );
+CREATE TABLE marketplace_service_db.cart_items (
+                                                   cart_id uuid,
+                                                   id uuid,
+                                                   added_at timestamp,
+                                                   product_id uuid,
+                                                   quantity int,
+                                                   unit_price decimal,
+                                                   PRIMARY KEY (cart_id, id)
+) WITH CLUSTERING ORDER BY (id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+    AND comment = ''
+    AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+    AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND speculative_retry = '99.0PERCENTILE'
+    AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
-CREATE TABLE IF NOT EXISTS orders (
-                                      id UUID PRIMARY KEY,
-                                      user_id UUID,
-                                      order_number TEXT,
-                                      total_amount DECIMAL,
-                                      status TEXT,
-                                      payment_status TEXT,
-                                      payment_attempts INT,
-                                      payment_reference TEXT,
-                                      created_at TIMESTAMP,
-                                      updated_at TIMESTAMP
-);
 
-CREATE INDEX IF NOT EXISTS orders_by_user ON orders(user_id);
+CREATE TABLE marketplace_service_db.carts (
+                                              user_id uuid,
+                                              id uuid,
+                                              created_at timestamp,
+                                              orderid uuid,
+                                              total_amount decimal,
+                                              updated_at timestamp,
+                                              PRIMARY KEY (user_id, id)
+) WITH CLUSTERING ORDER BY (id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+    AND comment = ''
+    AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+    AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND speculative_retry = '99.0PERCENTILE'
+    AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
-CREATE TABLE IF NOT EXISTS order_items (
-                                           id UUID,
-                                           order_id UUID,
-                                           product_id UUID,
-                                           quantity INT,
-                                           unit_price DECIMAL,
-                                           subtotal DECIMAL,
-                                           organisation_id UUID,
-                                           PRIMARY KEY ((order_id), id)
-    );
 
-CREATE TABLE IF NOT EXISTS addresses (
-                                         id UUID PRIMARY KEY,
-                                         user_id UUID,
-                                         street TEXT,
-                                         city TEXT,
-                                         state TEXT,
-                                         country TEXT,
-                                         zip_code TEXT,
-                                         is_default BOOLEAN,
-                                         created_at TIMESTAMP
-);
+CREATE TABLE marketplace_service_db.invoices (
+                                                 invoice_id text,
+                                                 amount decimal,
+                                                 customer_id text,
+                                                 due_date date,
+                                                 issue_date date,
+                                                 status text,
+                                                 PRIMARY KEY (invoice_id)
+) WITH bloom_filter_fp_chance = 0.01
+      AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+      AND comment = ''
+      AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+      AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+      AND crc_check_chance = 1
+      AND default_time_to_live = 0
+      AND gc_grace_seconds = 864000
+      AND max_index_interval = 2048
+      AND memtable_flush_period_in_ms = 0
+      AND min_index_interval = 128
+      AND speculative_retry = '99.0PERCENTILE'
+      AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
-CREATE INDEX IF NOT EXISTS addresses_by_user ON addresses(user_id);
 
-CREATE TABLE IF NOT EXISTS wishlists (
-                                         id UUID PRIMARY KEY,
-                                         user_id UUID,
-                                         created_at TIMESTAMP
-);
+CREATE TABLE marketplace_service_db.order_items (
+                                                    order_id uuid,
+                                                    id uuid,
+                                                    organisation_id uuid,
+                                                    product_id uuid,
+                                                    quantity int,
+                                                    subtotal decimal,
+                                                    unit_price decimal,
+                                                    PRIMARY KEY (order_id, id)
+) WITH CLUSTERING ORDER BY (id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+    AND comment = ''
+    AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+    AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND speculative_retry = '99.0PERCENTILE'
+    AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
-CREATE INDEX IF NOT EXISTS wishlists_by_user ON wishlists(user_id);
 
-CREATE TABLE IF NOT EXISTS wishlist_items (
-                                              id UUID,
-                                              wishlist_id UUID,
-                                              product_id UUID,
-                                              added_at TIMESTAMP,
-                                              PRIMARY KEY ((wishlist_id), id)
-    );
+CREATE TABLE marketplace_service_db.orders (
+                                               id uuid,
+                                               created_at timestamp,
+                                               order_number text,
+                                               payment_attempts int,
+                                               payment_reference text,
+                                               payment_status text,
+                                               status text,
+                                               total_amount decimal,
+                                               updated_at timestamp,
+                                               user_id uuid,
+                                               PRIMARY KEY (id)
+) WITH bloom_filter_fp_chance = 0.01
+      AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+      AND comment = ''
+      AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+      AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+      AND crc_check_chance = 1
+      AND default_time_to_live = 0
+      AND gc_grace_seconds = 864000
+      AND max_index_interval = 2048
+      AND memtable_flush_period_in_ms = 0
+      AND min_index_interval = 128
+      AND speculative_retry = '99.0PERCENTILE'
+      AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
-CREATE INDEX IF NOT EXISTS wishlist_items_by_product ON wishlist_items(product_id);
 
-CREATE TABLE IF NOT EXISTS reviews (
-                                       user_id UUID,
-                                       product_id UUID,
-                                       id UUID,
-                                       rating INT,
-                                       comment TEXT,
-                                       is_verified BOOLEAN,
-                                       created_at TIMESTAMP,
-                                       updated_at TIMESTAMP,
-                                       PRIMARY KEY ((user_id, product_id), id)
-    );
+CREATE INDEX orders_by_user ON marketplace_service_db.orders(user_id);
 
-CREATE TYPE IF NOT EXISTS invoice_items (
-    description TEXT,
-    quantity INT,
-    unit_price DECIMAL,
-    total DECIMAL
-);
 
-CREATE TABLE IF NOT EXISTS invoices (
-                                        invoice_id TEXT PRIMARY KEY,
-                                        customer_id TEXT,
-                                        amount DECIMAL,
-                                        issue_date DATE,
-                                        due_date DATE,
-                                        status TEXT
-);
+CREATE TABLE marketplace_service_db.organisation (
+                                                     id uuid,
+                                                     description text,
+                                                     name text,
+                                                     transferable boolean,
+                                                     PRIMARY KEY (id)
+) WITH bloom_filter_fp_chance = 0.01
+      AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+      AND comment = ''
+      AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+      AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+      AND crc_check_chance = 1
+      AND default_time_to_live = 0
+      AND gc_grace_seconds = 864000
+      AND max_index_interval = 2048
+      AND memtable_flush_period_in_ms = 0
+      AND min_index_interval = 128
+      AND speculative_retry = '99.0PERCENTILE'
+      AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
 
-CREATE TABLE IF NOT EXISTS organisation (
-                                            id UUID PRIMARY KEY,
-                                            name TEXT,
-                                            description TEXT,
-                                            transferable BOOLEAN
-);
+
+CREATE TABLE marketplace_service_db.products (
+                                                 id uuid,
+                                                 created_at timestamp,
+                                                 description text,
+                                                 name text,
+                                                 price decimal,
+                                                 quantity int,
+                                                 seller_id uuid,
+                                                 status text,
+                                                 updated_at timestamp,
+                                                 PRIMARY KEY (id)
+) WITH bloom_filter_fp_chance = 0.01
+      AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+      AND comment = ''
+      AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+      AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+      AND crc_check_chance = 1
+      AND default_time_to_live = 0
+      AND gc_grace_seconds = 864000
+      AND max_index_interval = 2048
+      AND memtable_flush_period_in_ms = 0
+      AND min_index_interval = 128
+      AND speculative_retry = '99.0PERCENTILE'
+      AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
+
+
+CREATE INDEX products_by_seller ON marketplace_service_db.products(seller_id);
+
+
+CREATE INDEX products_by_status ON marketplace_service_db.products(status);
+
+
+CREATE TABLE marketplace_service_db.reviews (
+                                                user_id uuid,
+                                                product_id uuid,
+                                                id uuid,
+                                                comment text,
+                                                created_at timestamp,
+                                                is_verified boolean,
+                                                rating int,
+                                                updated_at timestamp,
+                                                PRIMARY KEY ((user_id, product_id), id)
+    ) WITH CLUSTERING ORDER BY (id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+    AND comment = ''
+    AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+    AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND speculative_retry = '99.0PERCENTILE'
+    AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
+
+
+CREATE TABLE marketplace_service_db.users (
+                                              id uuid,
+                                              created_at timestamp,
+                                              email text,
+                                              first_name text,
+                                              is_active boolean,
+                                              last_name text,
+                                              password text,
+                                              phone text,
+                                              role text,
+                                              PRIMARY KEY (id)
+) WITH bloom_filter_fp_chance = 0.01
+      AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+      AND comment = ''
+      AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+      AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+      AND crc_check_chance = 1
+      AND default_time_to_live = 0
+      AND gc_grace_seconds = 864000
+      AND max_index_interval = 2048
+      AND memtable_flush_period_in_ms = 0
+      AND min_index_interval = 128
+      AND speculative_retry = '99.0PERCENTILE'
+      AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
+
+
+CREATE INDEX users_by_email ON marketplace_service_db.users(email);
+
+
+CREATE TABLE marketplace_service_db.wishlist_items (
+                                                       wishlist_id uuid,
+                                                       id uuid,
+                                                       added_at timestamp,
+                                                       product_id uuid,
+                                                       PRIMARY KEY (wishlist_id, id)
+) WITH CLUSTERING ORDER BY (id ASC)
+    AND bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+    AND comment = ''
+    AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+    AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND speculative_retry = '99.0PERCENTILE'
+    AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
+
+
+CREATE INDEX wishlist_items_by_product ON marketplace_service_db.wishlist_items(product_id);
+
+
+CREATE TABLE marketplace_service_db.wishlists (
+                                                  id uuid,
+                                                  created_at timestamp,
+                                                  user_id uuid,
+                                                  PRIMARY KEY (id)
+) WITH bloom_filter_fp_chance = 0.01
+      AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
+      AND comment = ''
+      AND compaction = {'class': 'SizeTieredCompactionStrategy'}
+      AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+      AND crc_check_chance = 1
+      AND default_time_to_live = 0
+      AND gc_grace_seconds = 864000
+      AND max_index_interval = 2048
+      AND memtable_flush_period_in_ms = 0
+      AND min_index_interval = 128
+      AND speculative_retry = '99.0PERCENTILE'
+      AND tombstone_gc = {'mode': 'timeout', 'propagation_delay_in_seconds': '3600'};
+
+
+CREATE INDEX wishlists_by_user ON marketplace_service_db.wishlists(user_id);

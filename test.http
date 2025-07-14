@@ -1,7 +1,7 @@
 
 GET http:127.0.0.1:4010/api/hello
 
-POST http://127.0.0.1:4010/api/cart/items
+POST http://37.60.243.35:4010/api/cart/items
 Content-Type: application/json
 User-Id: 123e4567-e89b-12d3-a456-426614174000
 
@@ -11,7 +11,7 @@ User-Id: 123e4567-e89b-12d3-a456-426614174000
   "unitPrice": 29.99
 }
 
-GET http://127.0.0.1:4010/api/cart
+GET http://37.60.243.35:4010/api/cart
 User-Id: 123e4567-e89b-12d3-a456-426614174000
 
 DELETE http://127.0.0.1:4010/api/cart/items/987e6543-e21b-65d4-b321-123456789abc
